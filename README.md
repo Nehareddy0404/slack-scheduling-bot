@@ -3,12 +3,6 @@
 Schedule meetings in plain English, directly from Slack.
 No calendar switching. No back-and-forth. Just type what you want.
 
-## ✨ Demo
-
-/schedule Team standup with Sarah tomorrow at 10am for 30 minutes
-
-→ Bot parses with AI, shows confirmation card, saves to database.
-
 ## 🚀 Features
 
 - `/schedule` — Natural language meeting scheduling via GPT-4o-mini
