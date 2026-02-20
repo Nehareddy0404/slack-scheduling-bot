@@ -1,69 +1,104 @@
-# CodeIgniter 4 Application Starter
+# 🗓️ SlackMeet — AI-Powered Meeting Scheduler for Slack
 
-## What is CodeIgniter?
+Schedule meetings in plain English, directly from Slack.
+No calendar switching. No back-and-forth. Just type what you want.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## ✨ Demo
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+/schedule Team standup with Sarah tomorrow at 10am for 30 minutes
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+→ Bot parses with AI, shows confirmation card, saves to database.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+## 🚀 Features
 
-## Installation & updates
+- `/schedule` — Natural language meeting scheduling via GPT-4o-mini
+- `/reschedule` — Pick from your meetings and set a new time
+- `/cancel` — Select exactly which meeting to cancel
+- `/schedstatus` — View all upcoming meetings with status
+- ✅ Interactive Confirm/Cancel buttons via Slack Block Kit
+- ⚡ Async processing — responds in <1 second, AI runs in background
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+## 🛠️ Tech Stack
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+| Layer | Technology |
+|---|---|
+| Backend | CodeIgniter 4 (PHP) |
+| AI/NLP | OpenAI GPT-4o-mini |
+| Database | MySQL |
+| Slack UI | Block Kit Interactive Cards |
+| Tunnel | ngrok |
 
-## Setup
+## 🏗️ Architecture
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+User types slash command
+→ SlackController responds instantly (<1s)
+→ Job stored in MySQL queue
+→ Background processor calls GPT-4o-mini
+→ Parsed meeting saved to DB
+→ Confirmation card sent to Slack
+→ User clicks Confirm → Meeting confirmed ✅
 
-## Important Change with index.php
+## ⚙️ Setup
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+### Prerequisites
+- PHP 8.x
+- MySQL
+- Composer
+- ngrok
+- OpenAI API key
+- Slack App with slash commands enabled
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+### Installation
 
-**Please** read the user guide for a better explanation of how CI4 works!
+# Clone the repo
+git clone https://github.com/yourusername/slackmeet.git
+cd slackmeet/backend
 
-## Repository Management
+# Install dependencies
+composer install
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+# Configure environment
+cp env .env
+# Edit .env with your DB credentials and OpenAI key
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+# Create database tables
+mysql -u root -p ci4 < schema.sql
 
-## Server Requirements
+# Start the server
+php spark serve
 
-PHP version 8.2 or higher is required, with the following extensions installed:
+# Start ngrok
+ngrok http 8080
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+# Process jobs (run this after each slash command)
+php spark slack:process
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+### Slack App Configuration
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+Set these Request URLs in your Slack App dashboard:
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+| Command | URL |
+|---|---|
+| `/schedule` | `https://your-ngrok-url/slack/schedule` |
+| `/reschedule` | `https://your-ngrok-url/slack/reschedule` |
+| `/cancel` | `https://your-ngrok-url/slack/cancel` |
+| `/schedstatus` | `https://your-ngrok-url/slack/schedstatus` |
+| Interactivity | `https://your-ngrok-url/slack/interactivity` |
+
+## 🗄️ Database Schema
+
+Two tables:
+- `slack_jobs` — Job queue for async processing
+- `meetings` — Confirmed meeting storage with JSON participants
+
+## 🔮 Future Enhancements
+
+- Google Calendar sync
+- Participant DM notifications
+- Recurring meeting support
+- Conflict detection
+- Always-on background processor with cron
+
+## 👩‍💻 Built By
+
+Neha Suram — Built in one day as part of a technical challenge.
